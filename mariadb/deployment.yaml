@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: postal-mariadb
-        image: mariadb #registry.redhat.io/rhel8/mariadb-105
+        image: mariadb
         ports:
         - containerPort: 3306
         env:
@@ -25,10 +25,6 @@ spec:
           value: "true"
         - name: MYSQL_USER
           value: root
-          # valueFrom:
-          #   secretKeyRef:
-          #     name: mariadb-secret
-          #     key: username
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -44,16 +40,10 @@ spec:
         volumeMounts:
         - name: mariadb-vol
           mountPath: /var/lib/mysql
-        # - name: remote-conf
-        #   mountPath: /etc/my.cnf.d/remote.cnf
-        #   subPath: remote.cnf
       volumes:
       - name: mariadb-vol
         persistentVolumeClaim:
           claimName: postal-mariadb-vol
-      # - name: remote-conf
-      #   configMap:
-      #     name: remote-conf
 ---
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"

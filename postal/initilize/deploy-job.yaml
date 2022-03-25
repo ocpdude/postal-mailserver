@@ -10,7 +10,7 @@ spec:
     spec:
       initContainers:
       - name: init-initialize
-        image: nexus.redcloud.land/shaker/alpine:ssl
+        image: docker.io/shaker242/alpine-openssl
         command: ["sh"]
         args: ["-c", "if [ ! -f /config/signing.key ]; then openssl genrsa -out /config/signing.key 2018; fi"]
       restartPolicy: Never
