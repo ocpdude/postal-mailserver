@@ -1,0 +1,32 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: initialize
+  namespace: postal
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      initContainers:
+      - name: init-initialize
+        image: nexus.redcloud.land/shaker/alpine:ssl
+        command: ["sh"]
+        args: ["-c", "if [ ! -f /config/signing.key ]; then openssl genrsa -out /config/signing.key 2018; fi"]
+      restartPolicy: Never
+      containers:
+        - name: postal-initialize
+          image: ghcr.io/postalserver/postal
+          imagePullPolicy: Always
+          command:
+            - bundle
+            - exec
+            - bin/postal
+            - initialize
+          volumeMounts:
+          - mountPath: /config
+            name: postal-config
+      volumes:
+      - name: postal-config
+        persistentVolumeClaim:
+          claimName: postal-config-pvc
