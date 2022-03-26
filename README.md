@@ -1,8 +1,6 @@
 ## Postal Mailserver for OpenShift
 
-I was working on simple mailserver to support various apps internally to my lab for notifcations - without setting up a full featured server / client. After looking at a few, I chose Postal and figured I'd share my configuration with everyone else trying to get it to work on Kubernetes/ OpenShift (OKD). I only enabled in-bound smtp/25 and the web interface, but everything is here if you'd like to expand that. 
-
-In the end, I desided not to move forward with Postal - so I don't expect this repo to be updated.
+I was working on a simple mailserver to support various apps internally to my lab for notifcations - without setting up a full featured server / client. After looking at a few, I chose Postal and figured I'd share my configuration with everyone else trying to get it to work on Kubernetes/ OpenShift (OKD). I only enabled in-bound smtp/25 and the web interface, but everything is here if you'd like to expand that. 
 
 #### The Install
 1. Create your namespace/project \
@@ -22,10 +20,10 @@ In the end, I desided not to move forward with Postal - so I don't expect this r
     `oc create -f rabbitmq/deployment.yaml -f rabbitmq/service.yaml` 
 
 4. While all of that is loading, now's a good time to configure and stage your postal.yml.
-   There are a couple of ways that I've done this, as a configmap and as a file on a nfs share - during my troubleshooting, I stuck with the nfs share so I could keep editing my postal.yml file eaiser.  However, it'd be better stored as a configmap, so I do encourage you doing that once your system is up and running.
+   There are a couple of ways that I've done this, as a configmap and as a file on a nfs share. During my troubleshooting, I stuck with the nfs share so I could keep editing my postal.yml file easier.  However, it'd be better stored as a configmap, so I do encourage you doing that once your system is up and running the way you like.
 
      - A copy of the generic file can be found at postal/postal.yml
-     - You'll need to edit this with your settings, for me, I just had to focus on the connections to MariaDB/RabbitMQ and ensure my MX record was set. When postal ran, the DNS Record test failed. This is likely becuase it's running withing OpenShift, but routing mail was successful. 
+     - You'll need to edit this with your settings, for me, I just had to focus on the connections to MariaDB/RabbitMQ and ensure my MX record was set. When postal ran, the DNS Record test failed, but routing mail was successful. I was able to verify everyting using 'dig'.
      - For DNS I have 1 MX record for domain redcloud.land pointing to mail.redcloud.land (internal / private network)
      - In order to access SMTP, I added a record in my haproxy to forward port 25 to nodePort 32025 (you'll see this in the postal/deployment.yaml)
         ```
@@ -63,8 +61,8 @@ In the end, I desided not to move forward with Postal - so I don't expect this r
     shaker@local: postal-mailserver\>  oc exec -it web-596599887d-2p624 -- bash
     1000750000@web-596599887d-2p624:/opt/postal/app$ postal make-user
     ```
-Now you should be able to access and log into the web portal... for the rest of the setup, please the official docs.
-Again, I'd like to point out that the DNS tests did not work, but I could verify the records were accurate using 'dig mx redcloud.land'.
+Now you should be able to access and log into the web portal. For the rest of the setup, please use the official docs (link below).
+Again, I'd like to point out that the DNS tests did not work, but I could verify the records were accurate using 'dig mx redcloud.land'. When sending test messages, they were successful. Once Postal was up and running, I ended up not liking it much and may switch to a simple postfix relay to my gmail.com account later on. Stay tuned if you're interested in that.
 
 >>> Docs: https://docs.postalserver.io/
 
